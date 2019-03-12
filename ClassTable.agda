@@ -17,9 +17,9 @@ record Ty : Set where
 
 record CSig : Set where
   field
-    super : Ty
-    flds  : List Ty
-    signs : List (List Ty × Ty)
+    supers : List Ty -- Inheritance Hierarchy 
+    flds   : List Ty
+    signs  : List (List Ty × Ty)
 
 -- Table with Class Signatures
 

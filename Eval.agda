@@ -10,6 +10,8 @@ open import Data.Vec.All renaming (All to AllV ; lookup to lookupV)
 open import Syntax Δ
 open import Implementation Δ
 
+open import Data.Vec using ()
+
 open CT n
 open Ty
 open CSig
@@ -44,13 +46,18 @@ eval (suc fuel) τ δ γ (Invk e m mp) with eval fuel τ δ γ e
 ... | nothing = nothing
 ... | just (VNew c cp) with eval-list fuel τ δ γ mp
 ...   | nothing = nothing
+...   | just mp' = let mi = lookup (implementations c) m
+                     in eval fuel τ δ mp' mi
+{-
 ...   | just mp' = let ci = lookupV (class c) δ 
                        mi = lookup (impls ci) m
                      in eval fuel τ δ mp' mi
+-}
 -- RC-New-Arg
 eval (suc fuel) τ δ γ (New c cp) with eval-list fuel τ δ γ cp
 ... | nothing = nothing
 ... | just cp' = just (VNew c cp')
+
 
 -- Fuel based evaluation for a list of expressions
 
