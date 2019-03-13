@@ -57,7 +57,7 @@ eval (suc fuel) τ δ γ (New c cp) with eval-list fuel τ δ γ cp
 eval (suc fuel) τ δ γ (UCast p e) with eval fuel τ δ γ e
 ... | nothing = nothing
 ... | just (VNew refl cp) = just (VNew p cp)
-... | just (VNew (exts s) cp) = {!!} -- how to process it?
+... | just (VNew p'@(exts s) cp) = just (VNew (<:-trans p' p) cp) 
 
 -- Fuel based evaluation for a list of expressions
 

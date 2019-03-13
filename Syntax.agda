@@ -27,6 +27,11 @@ infix 3 _<:_
 data _<:_ : Ty → Ty → Set where
   refl : ∀ {τ} → τ <: τ
   exts : ∀ {τ₁ τ₂} → τ₂ ∈ supers (lookup (class τ₁) Δ) → τ₁ <: τ₂
+
+-- Transitivity
+
+postulate
+  <:-trans : ∀ {τ₁ τ₂ τ₃} → τ₁ <: τ₂ → τ₂ <: τ₃ → τ₁ <: τ₃
   
 -- Inherently Typed Expression Definition
 
