@@ -19,6 +19,14 @@ open CSig
 
 Ctx : Set
 Ctx = List Ty
+
+-- Subtyping definition
+
+infix 3 _<:_
+
+data _<:_ : Ty → Ty → Set where
+  refl : ∀ {τ} → τ <: τ
+  exts : ∀ {τ₁ τ₂} → τ₂ ∈ supers (lookup (class τ₁) Δ) → τ₁ <: τ₂
   
 -- Inherently Typed Expression Definition
 
@@ -29,10 +37,11 @@ data Expr (Γ : Ctx) : Maybe Ty → Ty → Set where
   Invk  : ∀ {c m τ}   → Expr Γ τ c → m ∈ (signatures c)
                        → All (Expr Γ τ) (proj₁ m) → Expr Γ τ (proj₂ m)
   New   : ∀ {τ} c     → All (Expr Γ τ) (fields c) → Expr Γ τ c
+  UCast : ∀ {τ C D}   → C <: D → Expr Γ τ C → Expr Γ τ D
 
 
 -- Inherently Typed Values
 
 data Val : Ty → Set where
-  VNew : ∀ c → All Val (fields c) → Val c
+  VNew : ∀ {C D} → C <: D → All Val (fields C) → Val D
 

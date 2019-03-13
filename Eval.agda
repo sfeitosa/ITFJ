@@ -10,8 +10,6 @@ open import Data.Vec.All renaming (All to AllV ; lookup to lookupV)
 open import Syntax Δ
 open import Implementation Δ
 
-open import Data.Vec using ()
-
 open CT n
 open Ty
 open CSig
@@ -40,24 +38,26 @@ eval (suc fuel) τ δ γ (Var x) = just (lookup γ x)
 -- RC-Field and R-Field
 eval (suc fuel) τ δ γ (Field e f) with eval fuel τ δ γ e 
 ... | nothing = nothing
-... | just (VNew c cp) = just (lookup cp f)
+... | just (VNew refl cp) = just (lookup cp f)
+... | just (VNew (exts s) cp) = {!!} -- how to get the fields here?
 -- RC-Invk-Recv, RC-Invk-Arg and R-Invk
-eval (suc fuel) τ δ γ (Invk e m mp) with eval fuel τ δ γ e
+eval (suc fuel) τ δ γ (Invk e m mp) with eval-list fuel τ δ γ mp
 ... | nothing = nothing
-... | just (VNew c cp) with eval-list fuel τ δ γ mp
+... | just mp' with eval fuel τ δ γ e
 ...   | nothing = nothing
-...   | just mp' = let mi = lookup (implementations c) m
-                     in eval fuel τ δ mp' mi
-{-
-...   | just mp' = let ci = lookupV (class c) δ 
-                       mi = lookup (impls ci) m
-                     in eval fuel τ δ mp' mi
--}
+...   | just (VNew {C} refl cp) = 
+          let mi = lookup (implementations C) m
+            in eval fuel τ δ mp' mi
+...   | just (VNew (exts s) cp) = {!!} -- how to get methods here?
 -- RC-New-Arg
 eval (suc fuel) τ δ γ (New c cp) with eval-list fuel τ δ γ cp
 ... | nothing = nothing
-... | just cp' = just (VNew c cp')
-
+... | just cp' = just (VNew refl cp')
+-- R-Cast
+eval (suc fuel) τ δ γ (UCast p e) with eval fuel τ δ γ e
+... | nothing = nothing
+... | just (VNew refl cp) = just (VNew p cp)
+... | just (VNew (exts s) cp) = {!!} -- how to process it?
 
 -- Fuel based evaluation for a list of expressions
 
