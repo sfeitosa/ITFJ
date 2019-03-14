@@ -38,26 +38,24 @@ eval (suc fuel) τ δ γ (Var x) = just (lookup γ x)
 -- RC-Field and R-Field
 eval (suc fuel) τ δ γ (Field e f) with eval fuel τ δ γ e 
 ... | nothing = nothing
-... | just (VNew refl cp) = just (lookup cp f)
-... | just (VNew (exts s) cp) = {!!} -- how to get the fields here?
+... | just (VNew p cp) = just (lookup (dropFlds p cp) f)
 -- RC-Invk-Recv, RC-Invk-Arg and R-Invk
 eval (suc fuel) τ δ γ (Invk e m mp) with eval-list fuel τ δ γ mp
 ... | nothing = nothing
 ... | just mp' with eval fuel τ δ γ e
 ...   | nothing = nothing
-...   | just (VNew {C} refl cp) = 
-          let mi = lookup (implementations C) m
+...   | just (VNew {C} {D} p cp) = 
+          let mi = lookup (implementations D) m
             in eval fuel τ δ mp' mi
-...   | just (VNew (exts s) cp) = {!!} -- how to get methods here?
 -- RC-New-Arg
 eval (suc fuel) τ δ γ (New c cp) with eval-list fuel τ δ γ cp
 ... | nothing = nothing
 ... | just cp' = just (VNew refl cp')
 -- R-Cast
-eval (suc fuel) τ δ γ (UCast p e) with eval fuel τ δ γ e
+eval (suc fuel) τ δ γ (UCast refl e) = eval fuel τ δ γ e
+eval (suc fuel) τ δ γ (UCast p@(exts s) e) with eval fuel τ δ γ e
 ... | nothing = nothing
-... | just (VNew refl cp) = just (VNew p cp)
-... | just (VNew p'@(exts s) cp) = just (VNew (<:-trans p' p) cp) 
+... | just (VNew p' cp) = just (VNew (<:-trans p' p) cp)
 
 -- Fuel based evaluation for a list of expressions
 

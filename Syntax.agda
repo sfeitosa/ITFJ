@@ -28,7 +28,7 @@ data _<:_ : Ty → Ty → Set where
   refl : ∀ {τ} → τ <: τ
   exts : ∀ {τ₁ τ₂} → τ₂ ∈ supers (lookup (class τ₁) Δ) → τ₁ <: τ₂
 
--- Transitivity
+-- Transitivity: used when evaluating casts
 
 postulate
   <:-trans : ∀ {τ₁ τ₂ τ₃} → τ₁ <: τ₂ → τ₂ <: τ₃ → τ₁ <: τ₃
@@ -50,3 +50,9 @@ data Expr (Γ : Ctx) : Maybe Ty → Ty → Set where
 data Val : Ty → Set where
   VNew : ∀ {C D} → C <: D → All Val (fields C) → Val D
 
+
+-- Used when evaluating fields
+
+postulate 
+  dropFlds : ∀ {C D} → C <: D → All Val (fields C)
+                      → All Val (fields D)
