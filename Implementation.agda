@@ -31,16 +31,20 @@ CTImpl τ = AllV (CImpl τ) Δ
 
 -- Auxiliary function to concatenate implementation of superclasses
 
+{-
 concatImpl : ∀ {τ} → CTImpl τ → (l : List Ty)
      → All (λ s → Expr (proj₁ s) (just τ) (proj₂ s)) (concatMap (λ s → signs (lookup (class s) Δ)) l)
 concatImpl δ [] = All.[]
 concatImpl δ (x ∷ xs) = ++⁺ (impls (lookupV (class x) δ)) (concatImpl δ xs)
+-}
 
 -- Body method lookup
 
-implementations : ∀ {τ} → CTImpl τ → (C : Ty) → All (λ s → Expr (proj₁ s) (just τ) (proj₂ s)) (signatures C)
+postulate 
+  implementations : ∀ {τ} → CTImpl τ → (C : Ty) → All (λ s → Expr (proj₁ s) (just τ) (proj₂ s)) (signatures C)
+{-
 implementations δ C = ++⁺ (concatImpl δ (supers (lookup (class C) Δ))) (impls (lookupV (class C) δ))
-
+-}
 
 
 

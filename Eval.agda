@@ -50,12 +50,14 @@ eval (suc fuel) τ δ γ (Invk e m mp) with eval-list fuel τ δ γ mp
 -- RC-New-Arg
 eval (suc fuel) τ δ γ (New c cp) with eval-list fuel τ δ γ cp
 ... | nothing = nothing
-... | just cp' = just (VNew refl cp')
+... | just cp' = ? --just (VNew refl cp')
 -- R-Cast
-eval (suc fuel) τ δ γ (UCast refl e) = eval fuel τ δ γ e
+eval (suc fuel) τ δ γ (UCast sub e) = ? -- eval fuel τ δ γ e
+{-
 eval (suc fuel) τ δ γ (UCast p@(exts s) e) with eval fuel τ δ γ e
 ... | nothing = nothing
 ... | just (VNew p' cp) = just (VNew (<:-trans p' p) cp)
+-}
 
 -- Fuel based evaluation for a list of expressions
 

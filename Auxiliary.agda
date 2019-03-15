@@ -11,17 +11,43 @@ open CT n
 open Ty
 open CSig
 
-fields : Ty → List Ty
+-- Subtyping definition
+
+infix 3 _<:_
+
+postulate 
+  _<:_ : Ty → Ty → Set 
+{-
+  refl    : ∀ {τ} → τ <: τ
+  trans   : ∀ {τ₁ τ₂ τ₃} → τ₁ <: τ₂ -> τ₂ <: τ₃ -> τ₁ <: τ₃
+  extends : ∀ {τ} → τ <: super (lookup (class τ) Δ)
+-}
+
+postulate
+  fields : Ty → List Ty
+{-
 fields τ =
   concatMap (λ τ₁ → flds (c τ₁)) (supers (c τ)) ++ flds (c τ)
   where
     c : Ty → CSig
     c σ = lookup (class σ) Δ
+-}
 
-signatures : Ty → List (List Ty × Ty)
+{-
+fields' : ∀ {τ₁ τ₂} → τ₁ <: τ₂ → List Ty
+fields' {C} refl = flds (lookup (class C) Δ)
+fields' (trans sub sub₁) = {!!}
+fields' extends = {!!}
+-}
+
+postulate 
+  signatures : Ty → List (List Ty × Ty)
+
+{-
 signatures τ =
   concatMap (λ τ₁ → signs (c τ₁)) (supers (c τ)) ++ signs (c τ)
   where
     c : Ty → CSig
     c σ = lookup (class σ) Δ
+-}
 

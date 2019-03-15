@@ -8,19 +8,24 @@ open import Data.Product
 open import Data.Vec
 
 -- Featherweight Java Nominal Types
-
+{-
 record Ty : Set where
   field
     class : Fin n
+-}
+
+data Ty : Set where
+  object : Ty
+  class  : Fin n → Ty
 
 -- Class Signature Definition
 
 record CSig : Set where
   field
-    supers : List Ty -- Inheritance Hierarchy 
-    flds   : List Ty
-    signs  : List (List Ty × Ty)
-
+    super : Ty
+    flds  : List Ty
+    signs : List (List Ty × Ty)
+    
 -- Table with Class Signatures
 
 CTSig : Set
