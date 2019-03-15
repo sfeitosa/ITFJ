@@ -56,3 +56,4 @@ data Val : Ty → Set where
 postulate 
   dropFlds : ∀ {C D} → C <: D → All Val (fields C)
                       → All Val (fields D)
+

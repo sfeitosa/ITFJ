@@ -38,14 +38,14 @@ eval (suc fuel) τ δ γ (Var x) = just (lookup γ x)
 -- RC-Field and R-Field
 eval (suc fuel) τ δ γ (Field e f) with eval fuel τ δ γ e 
 ... | nothing = nothing
-... | just (VNew p cp) = just (lookup (dropFlds p cp) f)
+... | just (VNew {C} {D} p cp) = just (lookup (dropFlds p cp) f)
 -- RC-Invk-Recv, RC-Invk-Arg and R-Invk
 eval (suc fuel) τ δ γ (Invk e m mp) with eval-list fuel τ δ γ mp
 ... | nothing = nothing
 ... | just mp' with eval fuel τ δ γ e
 ...   | nothing = nothing
 ...   | just (VNew {C} {D} p cp) = 
-          let mi = lookup (implementations D) m
+          let mi = lookup (implementations δ D) m
             in eval fuel τ δ mp' mi
 -- RC-New-Arg
 eval (suc fuel) τ δ γ (New c cp) with eval-list fuel τ δ γ cp
