@@ -8,11 +8,6 @@ open import Data.Product
 open import Data.Vec
 
 -- Featherweight Java Nominal Types
-{-
-record Ty : Set where
-  field
-    class : Fin n
--}
 
 data Ty : Set where
   object : Ty
