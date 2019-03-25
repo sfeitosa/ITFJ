@@ -3,7 +3,7 @@ open import Data.Nat
 module ClassTable (n : ℕ) where
 
 open import Data.Fin
-open import Data.List
+open import Data.List hiding (lookup)
 open import Data.Product
 open import Data.Vec
 
@@ -25,4 +25,5 @@ record CSig : Set where
 
 CTSig : Set
 CTSig = Vec CSig n
+
 

@@ -25,3 +25,11 @@ signatures τ =
     c : Ty → CSig
     c σ = lookup (class σ) Δ
 
+open import Data.List.Membership.Propositional
+open import Data.List.Relation.Sublist.Propositional hiding (lookup)
+
+record CTSig' : Set where
+  field
+    Δ'   : Vec CSig n
+    wff : ∀ {τ₁ τ₂} → τ₂ ∈ supers (lookup (class τ₁) Δ')
+                     → (fields τ₂) ⊆ (fields τ₁)
