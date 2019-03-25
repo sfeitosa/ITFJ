@@ -48,8 +48,11 @@ signatures Δ τ =
 
 record WFCT : Set where
   field
-    SGN : CTSig
-    WFF : ∀ {c1 c2} → c2 ∈ CSig.supers (lookup (Ty.class c1) SGN)
-                     → (fields SGN c2) ⊆ (fields SGN c1)
-    WFI : ∀ {c1 c2} → c2 ∈ CSig.supers (lookup (Ty.class c1) SGN)
-                     → CSig.supers (lookup (Ty.class c2) SGN) ⊆ CSig.supers (lookup (Ty.class c1) SGN)
+    ξ : CTSig
+    wf-fields :
+      ∀ {c1 c2} → c2 ∈ CSig.supers (lookup (Ty.class c1) ξ)
+                 → (fields ξ c2) ⊆ (fields ξ c1)
+    wf-inheritance :
+      ∀ {c1 c2} → c2 ∈ CSig.supers (lookup (Ty.class c1) ξ)
+                 → CSig.supers (lookup (Ty.class c2) ξ) ⊆
+                    CSig.supers (lookup (Ty.class c1) ξ)

@@ -27,33 +27,39 @@ infix 3 _<:_
   
 data _<:_ : Ty → Ty → Set where
   refl : ∀ {τ} → τ <: τ
-  exts : ∀ {τ₁ τ₂} → τ₂ ∈ supers (lookup (class τ₁) (SGN Δ)) → τ₁ <: τ₂
+  exts : ∀ {τ₁ τ₂} → τ₂ ∈ supers (lookup (class τ₁) (ξ Δ)) → τ₁ <: τ₂
 
 -- Inherently Typed Expression Definition
   
 data Expr (Γ : Ctx) : Maybe Ty → Ty → Set where
   This  : ∀ {c}     → Expr Γ (just c) c
   Var   : ∀ {x τ}   → x ∈ Γ → Expr Γ τ x
-  Field : ∀ {c f τ} → Expr Γ τ c → f ∈ (fields (SGN Δ) c) → Expr Γ τ f
-  Invk  : ∀ {c m τ} → Expr Γ τ c → m ∈ (signatures (SGN Δ) c)
+  Field : ∀ {c f τ} → Expr Γ τ c → f ∈ (fields (ξ Δ) c) → Expr Γ τ f
+  Invk  : ∀ {c m τ} → Expr Γ τ c → m ∈ (signatures (ξ Δ) c)
                      → All (Expr Γ τ) (proj₁ m) → Expr Γ τ (proj₂ m)
-  New   : ∀ {τ} c   → All (Expr Γ τ) (fields (SGN Δ) c) → Expr Γ τ c
+  New   : ∀ {τ} c   → All (Expr Γ τ) (fields (ξ Δ) c) → Expr Γ τ c
   UCast : ∀ {τ C D} → C <: D → Expr Γ τ C → Expr Γ τ D
   
 -- Inherently Typed Values
   
 data Val : Ty → Set where
-  VNew : ∀ {C D} → C <: D → All Val (fields (SGN Δ) C) → Val D
+  VNew : ∀ {C D} → C <: D → All Val (fields (ξ Δ) C) → Val D
   
 -- Used when evaluating fields
   
-liftIdx : ∀ {C D f} → C <: D → All Val (fields (SGN Δ) C) → f ∈ (fields (SGN Δ) D) → f ∈ (fields (SGN Δ) C)
+liftIdx : ∀ {C D f} → C <: D → All Val (fields (ξ Δ) C)
+       → f ∈ (fields (ξ Δ) D) → f ∈ (fields (ξ Δ) C)
 liftIdx refl l i = i
-liftIdx {C} {D} (exts x) l i = lookup-in {lzero} {Ty} {fields (SGN Δ) D} {fields (SGN Δ) C} ((WFF Δ) {C} {D} x) i
+liftIdx {C} {D} (exts x) l i =
+  lookup-in {lzero} {Ty} {fields (ξ Δ) D} {fields (ξ Δ) C}
+            ((wf-fields Δ) {C} {D} x) i
 
 -- Transitivity: used when evaluating casts
 
 <:-trans : ∀ {τ₁ τ₂ τ₃} → τ₁ <: τ₂ → τ₂ <: τ₃ → τ₁ <: τ₃
 <:-trans refl p₂ = p₂
 <:-trans (exts x) refl = exts x
-<:-trans {τ₁} {τ₂} {τ₃} (exts x) (exts x₁) = exts (lookup-in {lzero} {Ty} {supers (lookup (class τ₂) (SGN Δ))} {supers (lookup (class τ₁) (SGN Δ))} ((WFI Δ) {τ₁} {τ₂} x) x₁)
+<:-trans {τ₁} {τ₂} {τ₃} (exts x) (exts x₁) =
+  exts (lookup-in {lzero} {Ty} {supers (lookup (class τ₂) (ξ Δ))}
+       {supers (lookup (class τ₁) (ξ Δ))}
+       ((wf-inheritance Δ) {τ₁} {τ₂} x) x₁)
