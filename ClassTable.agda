@@ -6,6 +6,8 @@ open import Data.Fin
 open import Data.List hiding (lookup)
 open import Data.Product
 open import Data.Vec hiding (_++_)
+open import Data.List.Membership.Propositional
+open import Data.List.Relation.Sublist.Propositional hiding (lookup)
 
 -- Featherweight Java Nominal Types
 
@@ -42,13 +44,12 @@ signatures Δ τ =
     c : Ty → CSig
     c σ = lookup (Ty.class σ) Δ
 
-open import Data.List.Membership.Propositional
-open import Data.List.Relation.Sublist.Propositional hiding (lookup)
-
 -- CT definition
 
 record WFCT : Set where
   field
     SGN : CTSig
-    WFF : ∀{c1 c2} → c2 ∈ CSig.supers (lookup (Ty.class c1) SGN)
-                    → (fields SGN c2) ⊆ (fields SGN c1)
+    WFF : ∀ {c1 c2} → c2 ∈ CSig.supers (lookup (Ty.class c1) SGN)
+                     → (fields SGN c2) ⊆ (fields SGN c1)
+    WFI : ∀ {c1 c2} → c2 ∈ CSig.supers (lookup (Ty.class c1) SGN)
+                     → CSig.supers (lookup (Ty.class c2) SGN) ⊆ CSig.supers (lookup (Ty.class c1) SGN)

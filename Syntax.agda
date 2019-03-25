@@ -28,11 +28,6 @@ infix 3 _<:_
 data _<:_ : Ty → Ty → Set where
   refl : ∀ {τ} → τ <: τ
   exts : ∀ {τ₁ τ₂} → τ₂ ∈ supers (lookup (class τ₁) (SGN Δ)) → τ₁ <: τ₂
-  
--- Transitivity: used when evaluating casts
-  
-postulate
-  <:-trans : ∀ {τ₁ τ₂ τ₃} → τ₁ <: τ₂ → τ₂ <: τ₃ → τ₁ <: τ₃
 
 -- Inherently Typed Expression Definition
   
@@ -45,7 +40,6 @@ data Expr (Γ : Ctx) : Maybe Ty → Ty → Set where
   New   : ∀ {τ} c   → All (Expr Γ τ) (fields (SGN Δ) c) → Expr Γ τ c
   UCast : ∀ {τ C D} → C <: D → Expr Γ τ C → Expr Γ τ D
   
-  
 -- Inherently Typed Values
   
 data Val : Ty → Set where
@@ -56,3 +50,10 @@ data Val : Ty → Set where
 liftIdx : ∀ {C D f} → C <: D → All Val (fields (SGN Δ) C) → f ∈ (fields (SGN Δ) D) → f ∈ (fields (SGN Δ) C)
 liftIdx refl l i = i
 liftIdx {C} {D} (exts x) l i = lookup-in {lzero} {Ty} {fields (SGN Δ) D} {fields (SGN Δ) C} ((WFF Δ) {C} {D} x) i
+
+-- Transitivity: used when evaluating casts
+
+<:-trans : ∀ {τ₁ τ₂ τ₃} → τ₁ <: τ₂ → τ₂ <: τ₃ → τ₁ <: τ₃
+<:-trans refl p₂ = p₂
+<:-trans (exts x) refl = exts x
+<:-trans {τ₁} {τ₂} {τ₃} (exts x) (exts x₁) = exts (lookup-in {lzero} {Ty} {supers (lookup (class τ₂) (SGN Δ))} {supers (lookup (class τ₁) (SGN Δ))} ((WFI Δ) {τ₁} {τ₂} x) x₁)
