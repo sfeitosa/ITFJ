@@ -1,6 +1,6 @@
 import ClassTable as CT
 
-module Eval {n} (Δ : CT.CTSig n) where
+module Eval {n} (Δ : CT.WFCT n) where
 
 open import Data.Nat
 open import Data.List.All
