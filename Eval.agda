@@ -1,6 +1,6 @@
 import ClassTable as CT
 
-module Eval {n} (Δ : CT.CTSig n) where
+module Eval {n} (Δ : CT.WFCT n) where
 
 open import Data.Nat
 open import Data.List.All
@@ -22,9 +22,9 @@ Env Γ = All Val Γ
 
 -- Evaluation
 
-eval      : ∀ {Γ τ c}  → ℕ → Maybe (Val τ) → CTImpl τ → Env Γ
+eval      : ∀ {Γ τ c}  → ℕ → Maybe (Val τ) → CTImpl → Env Γ
                         → Expr Γ (just τ) c → Maybe (Val c)
-eval-list : ∀ {Γ τ cs} → ℕ → Maybe (Val τ) → CTImpl τ → Env Γ
+eval-list : ∀ {Γ τ cs} → ℕ → Maybe (Val τ) → CTImpl → Env Γ
                         → All (Expr Γ (just τ)) cs → Maybe (All Val cs)
 
 -- Fuel based evaluation for a single expression
@@ -38,22 +38,21 @@ eval (suc fuel) τ δ γ (Var x) = just (lookup γ x)
 -- RC-Field and R-Field
 eval (suc fuel) τ δ γ (Field e f) with eval fuel τ δ γ e 
 ... | nothing = nothing
-... | just (VNew {C} {D} p cp) = just (lookup (dropFlds p cp) f)
+... | just (VNew p cp) = just (lookup cp (∈-lift p cp f))
 -- RC-Invk-Recv, RC-Invk-Arg and R-Invk
 eval (suc fuel) τ δ γ (Invk e m mp) with eval-list fuel τ δ γ mp
 ... | nothing = nothing
 ... | just mp' with eval fuel τ δ γ e
 ...   | nothing = nothing
-...   | just (VNew {C} {D} p cp) = 
-          let mi = lookup (implementations δ D) m
-            in eval fuel τ δ mp' mi
+...   | just v@(VNew {C} {D} p cp) =
+          let mi = lookup (implementations D δ) m
+            in eval fuel (just v) δ mp' mi
 -- RC-New-Arg
 eval (suc fuel) τ δ γ (New c cp) with eval-list fuel τ δ γ cp
 ... | nothing = nothing
 ... | just cp' = just (VNew refl cp')
 -- R-Cast
-eval (suc fuel) τ δ γ (UCast refl e) = eval fuel τ δ γ e
-eval (suc fuel) τ δ γ (UCast p@(exts s) e) with eval fuel τ δ γ e
+eval (suc fuel) τ δ γ (UCast p e) with eval fuel τ δ γ e
 ... | nothing = nothing
 ... | just (VNew p' cp) = just (VNew (<:-trans p' p) cp)
 
