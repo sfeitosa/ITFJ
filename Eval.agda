@@ -1,3 +1,9 @@
+------------------------------------------
+-- Evaluation of FJ expressions in Agda --
+-- Author: Samuel da Silva Feitosa      --
+--         Alejandro Serrano Mena       --
+-- Date: Between Feb and Apr / 2019     --
+------------------------------------------
 import ClassTable as CT
 
 module Eval {n} (Δ : CT.WFCT n) where
@@ -11,23 +17,25 @@ open import Syntax Δ
 open import Implementation Δ
 
 open CT n
-open Ty
 open CSig
 open CImpl
 
 -- Values associated to their types on a given context
+------------------------------------------------------
 
 Env : Ctx → Set
 Env Γ = All Val Γ
 
--- Evaluation
+-- Mutual recursive evaluation functions definition
+---------------------------------------------------
 
 eval      : ∀ {Γ τ c}  → ℕ → Maybe (Val τ) → CTImpl → Env Γ
-                        → Expr Γ (just τ) c → Maybe (Val c)
+                       → Expr Γ (just τ) c → Maybe (Val c)
 eval-list : ∀ {Γ τ cs} → ℕ → Maybe (Val τ) → CTImpl → Env Γ
-                        → All (Expr Γ (just τ)) cs → Maybe (All Val cs)
+                       → All (Expr Γ (just τ)) cs → Maybe (All Val cs)
 
 -- Fuel based evaluation for a single expression
+------------------------------------------------
 
 -- out of fuel
 eval zero _ _ _ _ = nothing
@@ -57,6 +65,7 @@ eval (suc fuel) τ δ γ (UCast p e) with eval fuel τ δ γ e
 ... | just (VNew p' cp) = just (VNew (<:-trans p' p) cp)
 
 -- Fuel based evaluation for a list of expressions
+--------------------------------------------------
 
 -- Out of fuel
 eval-list zero _ _ _ _ = nothing
